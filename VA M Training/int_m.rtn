@@ -1,0 +1,1453 @@
+Saved by %RS from [TRN,STU] on  4-NOV-2000 19:03:42.38
+INTERMEDIATE MUMPS ROUTINES
+VECS512
+VECS512	;ATL/ACE PROGRAMMER-EMPLOYEE SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;OPT = Option number as entered by the user
+	;NAME = The employee's name
+	;NR = The employee number
+	;^VECEMP( = The employee file
+	;
+MENU	;
+	W !!,"Employee System"
+	W !!,"Option   Function"
+	W !!,"1        Load employess"
+	W !!,"2        Print employees"
+	R !!!,"Enter option number:  ",OPT:DTIME G EXIT:OPT=""
+	I '$T!(OPT["^") G EXIT
+	I OPT<1!(OPT>2) W !,"Enter 1 or 2" G MENU
+OPTIONS	;
+	D LOAD:OPT=1
+	D PRINT:OPT=2
+	G MENU
+EXIT	;
+	K OPT,NAME,NR
+	Q
+LOAD	;
+	R !!,"Enter employee number:  ",NR:DTIME G LOADEX:NR=""
+	I '$T!(NR["^") G LOADEX
+	R !,"Enter employee name:  ",NAME:DTIME
+	I '$T!(NAME["^") G LOADEX
+	S ^VECEMP(NR)=NAME
+	G LOAD
+LOADEX	;
+	Q
+PRINT	;
+	S NR=""
+	F  S NR=$O(^VECEMP(NR)) Q:NR=""  D OUTPUT
+	Q
+OUTPUT	;
+	W !!,"The employee number is ",NR
+	W !,"The name is ",^VECEMP(NR)
+	Q
+
+VECS517
+VECS517	;ATL/ACE PROGRAMMER-INVENTORY SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;OPT = Option number as entered by the user
+	;DESCR = Description of the inventory item
+	;NR = The item number
+	;^VECINV( = The inventory file
+MENU	;
+	W !!,"Inventory System"
+	W !!,"Option    Function"
+	W !!,"1         Load stock items"
+	W !!,"2         Print stock items"
+	R !!!,"Enter option number: ",OPT:DTIME G EXIT:OPT=""
+	I '$T!(OPT["^") G EXIT
+	I OPT<1!(OPT>2) W !,"Enter 1 or 2" G MENU
+OPTIONS	;
+	D LOAD:OPT=1
+	D PRINT:OPT=2
+	G MENU
+EXIT	;
+	K OPT,DESCR,NR
+	Q
+LOAD	;
+	R !!,"Enter stock number: ",NR:DTIME G LOADEX:NR=""
+	I '$T!(NR["^") G LOADEX
+	R !,"Enter item description: ",DESCR:DTIME
+	I '$T!(DESCR["^") G LOADEX
+	S ^VECINV(NR)=DESCR
+	G LOAD
+LOADEX	;
+	Q
+PRINT	;
+	S NR=""
+	F  S NR=$O(^VECINV(NR)) Q:NR=""  D OUTPUT
+	Q
+OUTPUT	;
+	W !!,"The stock number is ",NR
+	Q
+
+VECS55
+VECS55	;
+	;;1
+	FOR RECNR=1:1:5 DO ENTER
+	QUIT
+ENTER	;
+	READ !,"Enter name: ",NAME:DTIME
+	IF '$T!(NAME["^") GOTO ENEXIT
+	SET ^VECARR1(RECNR)=NAME
+ENEXIT	;
+	QUIT
+
+VECS56
+VECS56	;
+	;;1
+	S RECNR=""
+	F  S RECNR=$ORDER(^VECARR1(RECNR)) Q:RECNR=""  D PR
+	QUIT
+PR	;
+	W !,"The content for record number ",RECNR
+	W " is ",^VECARR1(RECNR)
+	Q
+
+VECS59
+VECS59	;ATL/ACE PROGRAMMER-DICTIONARY SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;OPT = Option number as entered by the user
+	;WORD = The word being defined
+	;DEF = The definition 
+	;^VECDIC( = The dictionary file
+	;
+MENU	;
+	W !!,"Dictionary System"
+	W !!,"Option    Function"
+	W !!,"1         Load dictionary"
+	W !!,"2         Print dictionary"
+	R !!!,"Enter option number: ",OPT:DTIME G EXIT:OPT=""
+	I '$T!(OPT["^") G EXIT
+	I OPT<1!(OPT>2) W !,"Enter 1 or 2" G MENU
+OPTIONS	;
+	D LOAD:OPT=1
+	D PRINT:OPT=2
+	G MENU
+EXIT	;
+	K OPT,WORD,DEF
+	Q
+LOAD	;
+	R !!,"Enter word: ",WORD:DTIME G LOADEX:WORD=""
+	I '$T!(WORD["^") G LOADEX
+	R !,"Enter short definition: ",DEF:DTIME
+	I '$T!(DEF["^") G LOADEX
+	S ^VECDIC(WORD)=DEF
+	G LOAD
+LOADEX	;
+	Q
+PRINT	;
+	S WORD=""
+	F  S WORD=$O(^VECDIC(WORD)) Q:WORD=""  D OUTPUT
+	Q
+OUTPUT	;
+	W !!,"The word is ",WORD
+	W !,"The definition is ",^VECDIC(WORD)
+	Q
+
+VECS5CR
+VECS5CR	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;	VARIABLE LIST
+	;
+	;	NAME		=	Individual's name
+	;	ADDR		=	Address
+	;	CITY		=	City
+	;	STATE		=	State
+	;	ZIP		=	Zip code
+	;	
+START	;
+	W @IOF
+	W !!,?20,"Create Mailing List entry"
+NAME	;
+	R !!,"Enter NAME : ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.AP1","1U.AP!($L(NAME)>30)!(NAME["?") 
+	I  W !,"Enter the name of the new entry. "
+	I  W "Enter last name,first name",! G NAME
+	D CREATE,STORE G NAME
+EXIT	;
+	K NAME,ADDR,CITY,STATE,ZIP
+	Q
+CREATE	;
+	S (ADDR,CITY,STATE,ZIP)=""
+ADDR	;
+	R !,"ADDRESS : ",ADDR:DTIME I '$T!(ADDR["^") G CREXIT
+	I ADDR="" G CITY
+	I ADDR'?.ANP!($L(ADDR)>25)!(ADDR["?") 
+	I  W !,"Address must not exceed 25 characters",! G ADDR
+CITY	;
+	R !,"CITY : ",CITY:DTIME I '$T!(CITY["^") G CREXIT
+	I CITY="" G STATE
+	I CITY'?.ANP!($L(CITY)>20)!(CITY["?") 
+	I  W !,"City must not exceed 20 characters" G CITY
+STATE	;
+	R !,"STATE : ",STATE:DTIME I '$T!(STATE["^") G CREXIT
+	I STATE="" G ZIP
+	I STATE'?2U!(STATE["?") W !,"State must be a 2 letter"
+	I  W " abbreviation",! G STATE
+ZIP	;
+	R !,"ZIP CODE : ",ZIP:DTIME I '$T!(ZIP["^") G CREXIT
+	I ZIP="" G CREXIT
+	I ZIP'?5N&(ZIP'?9N)!(ZIP["?") W !,"Zip code must be five"
+	I  W " or nine digits, no hyphens" G ZIP
+CREXIT	;
+	Q
+STORE	;
+	S ^VECS5G(NAME)=ADDR_"^"_CITY_"^"_STATE_"^"_ZIP
+	Q
+
+VECS5DEL
+VECS5DEL	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;	VARIABLE LIST
+	;
+	;	NAME		=	Individual's name
+	;	ANS		=	User's response:
+	;					<ENTER>, YES, or Y if they want to 
+	;						delete record
+	;					any other response if they don't
+	;						want to delete
+	;	MISSING	=	Set to 1 if NAME does not exist
+START	;
+	W @IOF
+	W !!,?20,"Delete Mailing List entry"
+NAME	;
+	S MISSING=0
+	R !!,"Enter NAME : ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.A1","1U.AP!($L(NAME)>30)!(NAME["?") 
+	I  W !,"Enter the name of the new entry."
+	I  W "  Enter last name,first name",! G NAME
+	D LOOKUP D DELETE:MISSING'=1 G NAME
+EXIT	;
+	K NAME,ANS,MISSING
+	Q
+LOOKUP	;
+	I $D(^VECS5G(NAME))=0 W !,"Record does not exist"
+	I  S MISSING=1
+	Q
+DELETE	;
+	R !!,"Are you sure? NO//",ANS:DTIME
+	I '$T!(ANS["^") G DELEXIT
+	I (ANS="Y")!(ANS="YES") K ^VECS5G(NAME)
+	I  W !,"Name deleted!"
+	E  W !,"Name not deleted!"
+DELEXIT	;
+	Q
+
+VECS5ED
+VECS5ED	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;	VARIABLE LIST
+	;	NAME, ADDR, CITY, STATE, ZIP = same as VECS5CR
+	;	MISSING	=	set to 1 if NAME does not exist
+	;	RECORD	=	contains record copied from ^VECS5G
+	;	INDATA	=	user's response before it is validated
+START	;
+	W @IOF
+	W !!,?20,"Edit Mailing List entry"
+NAME	;
+	S MISSING=0
+	R !!,"Enter NAME : ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.A1","1U.AP!($L(NAME)>30)!(NAME["?") 
+	I  W !,"Enter the name of the new entry."
+	I  W "  Enter last name,first name",! G NAME
+	D LOOKUP D STORE:MISSING'=1 G NAME
+EXIT	;
+	K NAME,ADDR,CITY,STATE,ZIP,MISSING,RECORD,INDATA
+	Q
+LOOKUP	;
+	I $D(^VECS5G(NAME))=0 W !,"Record does not exist"
+	I  S MISSING=1 G LOOKEXIT
+	S RECORD=^VECS5G(NAME)
+	S ADDR=$P(RECORD,"^",1)
+	S CITY=$P(RECORD,"^",2)
+	S STATE=$P(RECORD,"^",3)
+	S ZIP=$P(RECORD,"^",4)
+ADDR	;
+	W !,"ADDRESS : ",$S(ADDR="":"",1:ADDR_"//") R INDATA:DTIME 
+	I '$T!(INDATA["^") G LOOKEXIT
+	I INDATA="" G CITY
+	I INDATA'?.ANP!($L(INDATA)>25)!(INDATA["?") W !,"Address must not "
+	I  W "exceed 25 characters",! G ADDR
+	S ADDR=INDATA
+CITY	;
+	W !,"CITY : ",$S(CITY="":"",1:CITY_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G LOOKEXIT
+	I INDATA="" G STATE
+	I INDATA'?.ANP!($L(INDATA)>20)!(INDATA["?") W !,"City must not exceed"
+	I  W " 20 characters" G CITY
+	S CITY=INDATA
+STATE	;
+	W !,"STATE : ",$S(STATE="":"",1:STATE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G LOOKEXIT
+	I INDATA="" G ZIP
+	I INDATA'?2U!(INDATA["?") W !,"State must be a 2 letter"
+	I  W " abbreviation",! G STATE
+	S STATE=INDATA
+ZIP	;
+	W !,"ZIP CODE : ",$S(ZIP="":"",1:ZIP_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G LOOKEXIT
+	I INDATA="" G LOOKEXIT
+	I INDATA'?5N&(INDATA'?9N)!(INDATA["?") W !,"Zip code must be five or"
+	I  W " nine digits, no hyphens" G ZIP
+	S ZIP=INDATA
+LOOKEXIT	;
+	Q
+STORE	;
+	S ^VECS5G(NAME)=ADDR_"^"_CITY_"^"_STATE_"^"_ZIP
+	Q
+
+VECS5MN
+VECS5MN	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;OPT = Option number as entered by user
+	;IOF = Control characters to clear screen (not to
+	;                       be KILLed)
+	;DTIME = Delay time for READs (not to be KILLed)
+	;II    =  Loop counter to display menu text
+	;
+MAIN	;
+	D DISMENU
+	I OPT=""!(OPT["^") G EXIT
+	D ^VECS5CR:OPT=1,^VECS5ED:OPT=2,^VECS5DEL:OPT=3,^VECS5PR:OPT=4
+	G MAIN
+DISMENU	;
+	W @IOF
+	W !!!,"Mailing List System"
+	W !!,"Options    Functions"
+	F II=1:1:4 D DISMENU2
+DISMENU1	;
+	R !!,"Enter option number: ",OPT:DTIME
+	I '$T!(OPT["^")!(OPT="") Q
+	I (OPT<1)!(OPT>4)!(OPT="?") W !!,"Option must be "
+	I  W "between 1 and 4" G DISMENU1
+	Q
+DISMENU2	;
+	W !!,II,$P($T(OPTIONS+II),";",3)
+	Q
+EXIT	;
+	K II,OPT
+	Q
+OPTIONS	;
+	;;.....Create Mailing List entry
+	;;.....Edit Mailing List entry
+	;;.....Delete Mailing List entry
+	;;.....Print Mailing List entry
+
+VECS5PR
+VECS5PR	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;NAME   = Individual's name
+	;RECORD = copy of ^VECS5G(NAME) node
+	;ANS    = user's response to "Press Enter..." prompt
+	;
+START	;
+	D HEADING
+	D ORDER
+	R !!,"Press Enter to go back to the menu",ANS:DTIME
+EXIT	;
+	K NAME,RECORD,ANS
+	Q
+HEADING	;
+	W @IOF
+	W !!,?30,"Mailing List File Listing"
+	Q
+ORDER	;
+	S NAME=""
+	F  S NAME=$O(^VECS5G(NAME)) Q:NAME=""  D DISPLAY
+	Q
+DISPLAY	;
+	W !!,NAME
+	I $D(^VECS5G(NAME))=0 Q
+	S RECORD=^VECS5G(NAME)
+	W !,$P(RECORD,"^",1)
+	W !,$P(RECORD,"^",2)
+	W !,$P(RECORD,"^",3)
+	W !,$P(RECORD,"^",4)
+	Q
+
+VECS6CR
+VECS6CR	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;RECNR = Record number selected
+	;NAME = Individual's name
+	;ADDR = Address
+	;CITY = City
+	;STATE = State
+	;ZIP = Zip code
+	;PHONE = Phone number
+	;LCD = Last date of contact
+	;DTIME = Delay time
+	;OK = Flag used with the LOCK command
+	;  OK=1 when file is ok for updates
+	;  OK=0 when file is busy
+START	;
+	W @IOF
+	W !!,?20,"Create Mailing List entry"
+ASK	;
+	R !!,"Enter NAME: ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.U1","1U.UP!($L(NAME)>30)!(NAME["?")
+	I  W !,"Enter the name of the desired entry."
+	I  W " Enter last name,first name.",! G ASK
+	S OK=1 D ADD,EDITFLDS:OK G ASK
+EXIT	;
+	K NAME,ADDR,CITY,STATE,ZIP,PHONE,LCD,OK,RECNR
+	Q
+ADD	;Create a new record
+	L ^VECS6G(0):5 I '$T W !,"File is busy, try again later" S OK=0 Q 
+	I '$D(^VECS6G(0)) S ^VECS6G(0)="MAILING LIST^1^0^0"
+	F RECNR=$P(^VECS6G(0),"^",3)+1:1 I '$D(^VECS6G(RECNR)) Q
+	S $P(^VECS6G(0),"^",3,4)=RECNR_"^"_($P(^VECS6G(0),"^",4)+1)
+	S ^VECS6G(RECNR,0)=NAME L
+	W !,"Record # ",RECNR,!
+	Q
+EDITFLDS	;Edit data fields
+	S (ADDR,CITY,STATE,ZIP,PHONE,LCD)=""
+ADDR	;
+	L ^VECS6G(RECNR,0):5
+	I '$T W !,"File is busy, try again later" Q 
+	R !,"ADDRESS: ",ADDR:DTIME I '$T!(ADDR["^") G EDEXIT
+	I ADDR'="",ADDR'?.ANP!($L(ADDR)>25)!(ADDR["?")
+	I  W !,"Address must not exceed 25 characters.",!,$C(7) G ADDR
+CITY	;
+	R !,"CITY: ",CITY:DTIME I '$T!(CITY["^") G EDEXIT
+	I CITY'="",CITY'?.ANP!($L(CITY)>20)!(CITY["?")
+	I  W !,"City must not exceed 20 characters.",!,$C(7) G CITY
+STATE	;
+	R !,"STATE: ",STATE:DTIME I '$T!(STATE["^") G EDEXIT
+	I STATE'="",STATE'?2U W !,"State must be a 2 character "
+	I  W "abbreviation.",!,$C(7) G STATE
+ZIP	;
+	R !,"ZIP: ",ZIP:DTIME I '$T!(ZIP["^") G EDEXIT
+	I ZIP'="",ZIP'?5N&(ZIP'?9N) W !,"Zip must be five or "
+	I  W "nine digits, no hyphen",!,$C(7) G ZIP
+PHONE	;
+	R !,"PHONE: ",PHONE:DTIME I '$T!(PHONE["^") G EDEXIT
+	I PHONE'="",PHONE'?3N1"-"3N1"-"4N&(PHONE'?3N1"-"4N)
+	I  W !,"Phone must be entered with or without area "
+	I  W "code, using hyphens.",!,$C(7) G PHONE
+LCD	;
+	R !,"LAST CONTACT DATE: ",LCD:DTIME I '$T!(LCD["^") G EDEXIT
+	I LCD'="",LCD'?2N1"/"2N1"/"4N W !,"Enter a date in the "
+	I  W "format of MM/DD/YYYY, where MM & DD are each two "
+	I  W "digits and YYYY is 4 digits.",!,$C(7) G LCD
+	;
+	; THE DATE IS ACCEPTED IN NORMAL DISPLAY FORMAT MM/DD/YYYY
+	; BUT IS STORED IN INTERNAL FORMAT YYYMMDD WITH NO SLASHES.
+	;
+	I LCD'="" S LCD=($E(LCD,7,10)-1700)_$E(LCD,1,2)_$E(LCD,4,5)
+EDEXIT	;
+	S ^VECS6G(RECNR,0)=NAME_"^"_ADDR_"^"_CITY_"^"_STATE_"^"_ZIP_"^"_PHONE_"^"_LCD
+	L
+	Q
+
+VECS6DEL
+VECS6DEL	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM [ 08/31/92  6:09 AM ]
+	;;1
+START	;
+	W @IOF
+	W !!,?20,"Delete Mailing List entry"
+NAME	;
+	S MISSING=0
+	R !!,"Enter NAME: ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.A1","1U.AP!($L(NAME)>30)!(NAME["?")
+	I  W !,"Enter the name of the new entry."
+	I  W " Enter last name,first name",! G NAME
+	D LOOKUP D DELETE:MISSING'=1 G NAME
+EXIT	;
+	K NAME,ANS,MISSING
+	Q
+LOOKUP	;
+	F RECNR=0:0 S RECNR=$O(^VECS6G(RECNR)) Q:RECNR'>0  I $D(^VECS6G(RECNR,0)),($P(^VECS6G(RECNR,0),"^",1)=NAME) Q
+	I RECNR'>0 S MISSING=1
+	Q
+DELETE	;
+	R !!,"Are you sure? NO//",ANS:DTIME
+	I '$T!(ANS["^") G DELEXIT
+	I (ANS="Y")!(ANS="YES") K ^VECS6G(RECNR)
+	I  S $P(^VECS6G(0),"^",4)=$P(^VECS6G(0),"^",4)-1
+	I  W !,"Name deleted!"
+	E  W !,"Name not deleted!"
+	Q
+DELEXIT	;
+	Q
+
+VECS6ED
+VECS6ED	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	; NAME, ADDR, CITY, STATE, ZIP, PHONE, LCD...
+	; same as CReate routine
+	; RECNR = Record number assigned in CReate
+	; INDATA = Temporary variable used to hold entry made by user 
+	;          before it has been validated
+	; XDATE = Holds the display format of the date
+	; RECORD = Copy of the contents of the data node
+START	;
+	W @IOF
+	W !!,?20,"Edit Mailing List entry"
+ASK	;
+	R !!,"Enter NAME: ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.U1","1U.UP!($L(NAME)>30)!(NAME["?")
+	I  W !,"Enter the name of the desired entry. "
+	I  W "Enter last name,first name.",! G ASK
+	D LOOKUP,EDITFLDS:RECNR>0 G ASK
+EXIT	;
+	K NAME,ADDR,CITY,STATE,ZIP,PHONE,LCD,RECNR,INDATA,XDATE
+	K RECORD
+	Q
+LOOKUP	;
+	F RECNR=0:0 S RECNR=$O(^VECS6G(RECNR)) Q:RECNR'>0  I $D(^VECS6G(RECNR,0)),($P(^VECS6G(RECNR,0),"^",1)=NAME) S RECORD=^VECS6G(RECNR,0) Q
+	I RECNR'>0 W $C(7),"  ??",!
+	Q
+EDITFLDS	;Edit data fields
+	L ^VECS6G(RECNR,0):5
+	I '$T W !,"File is busy, try again later" Q 
+	S NAME=$P(RECORD,"^",1),ADDR=$P(RECORD,"^",2)
+	S CITY=$P(RECORD,"^",3)
+	S STATE=$P(RECORD,"^",4),ZIP=$P(RECORD,"^",5)
+	S PHONE=$P(RECORD,"^",6),LCD=$P(RECORD,"^",7)
+	;
+	; SINCE THE DATE IS STORED IN INTERNAL FORMAT YYYMMDD,
+	; WE MUST TRANSFORM IT INTO DISPLAY FORMAT MM/DD/YYYY.
+	I LCD'="" S XDATE=$E(LCD,4,5)_"/"_$E(LCD,6,7)_"/"_($E(LCD,1,3)+1700)
+	I LCD="" S XDATE=""
+NAME	;
+	W !,"NAME: ",$S(NAME="":"",1:NAME_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?1U.U1","1U.UP!($L(INDATA)>30)!(INDATA["?")
+	I  W !,"Enter the name of the desired entry. "
+	I  W "Enter last name,first name.",!,$C(7) G NAME
+	S:INDATA'="" NAME=INDATA
+ADDR	;
+	W !,"ADDRESS: ",$S(ADDR="":"",1:ADDR_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?.ANP!($L(INDATA)>25)!(INDATA["?") W !,"Address must "
+	I  W "not exceed 25 characters.",!,$C(7) G ADDR
+	S:INDATA'="" ADDR=INDATA
+CITY	;
+	W !,"CITY: ",$S(CITY="":"",1:CITY_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?.ANP!($L(INDATA)>20)!(INDATA["?") W !,"City must not "
+	I  W "exceed 20 characters.",!,$C(7) G CITY
+	S:INDATA'="" CITY=INDATA
+STATE	;
+	W !,"STATE: ",$S(STATE="":"",1:STATE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?2U W !,"State must be a 2 character "
+	I  W "abbreviation.",!,$C(7) G STATE
+	S:INDATA'="" STATE=INDATA
+ZIP	;
+	W !,"ZIP: ",$S(ZIP="":"",1:ZIP_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?5N&(INDATA'?9N) W !,"Zip must be five or "
+	I  W "nine digits, no hyphen",!,$C(7) G ZIP
+	S:INDATA'="" ZIP=INDATA
+PHONE	;
+	W !,"PHONE: ",$S(PHONE="":"",1:PHONE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?3N1"-"3N1"-"4N&(INDATA'?3N1"-"4N) W !,"Phone must "
+	I  W "be entered with or without area code, using "
+	I  W "hyphens.",!,$C(7) G PHONE
+	S:INDATA'="" PHONE=INDATA
+LCD	;
+	W !,"LAST CONTACT DATE: ",$S(XDATE="":"",1:XDATE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	I INDATA'="",INDATA'?2N1"/"2N1"/"4N W !,"Enter a date in the "
+	I  W "format of MM/DD/YYYY, where MM & DD are each two "
+	I  W "digits and YYYY is 4 digits.",!,$C(7) G LCD
+	; AGAIN, THE DATE IS DISPLAYED IN DISPLAY FORMAT MM/DD/YYYY BUT IS STORED 
+	; IN INTERNAL FORMAT YYYMMDD WITH NO SLASHES.  IF THE DATE HAS BEEN
+	; CHANGED, THE TRANSFORMATION TO INTERNAL FORMAT IS DONE ON THE VARIABLE
+	; INDATA--IF IT HAS NOT BEEN CHANGED, XDATE IS USED.
+	S:INDATA'="" LCD=($E(INDATA,7,10)-1700)_$E(INDATA,1,2)_$E(INDATA,4,5)
+	S:INDATA="" LCD=($E(XDATE,7,10)-1700)_$E(XDATE,1,2)_$E(XDATE,4,5)
+EDEXIT	;
+	S $P(^VECS6G(RECNR,0),"^",1,7)=NAME_"^"_ADDR_"^"_CITY_"^"_STATE_"^"_ZIP_"^"_PHONE_"^"_LCD
+	L
+	Q
+
+VECS6MN
+VECS6MN	;ATL/ACE PROGRAMMER-MAILING LIST SYSTEM ;12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;SPECIAL VARIABLES USED IN VA (not to be KILLed):
+	;  DTIME.....Delay time
+	;  IOF.......contains the codes to start output
+	;            at the top of a page or screen
+	;APPLICATION VARIABLES:
+	;  OPT.......Option number chosen by the user
+	;  ROUTINE...Routine name for option chosen
+	;  ITEMS.....Number of items in menu
+	;  II.........Menu loop counter
+	;  XDESCR......Text for menu option
+	;
+MAIN	;
+	D DISMENU
+	I (OPT["^") G EXIT
+	S ROUTINE=$P($T(OPTIONS+OPT),"^",2,3)
+	D @ROUTINE G MAIN
+EXIT	;
+	K OPT,ROUTINE,ITEMS,II,XDESCR
+	Q
+DISMENU	;
+	W @IOF
+	W !!!,?20,"MAILING LIST SYSTEM"
+	W !!,"OPTIONS    FUNCTIONS"
+	F II=1:1 D DISMENU2 Q:XDESCR=""
+	S ITEMS=II-1
+DISMENU1	;
+	R !!,"ENTER OPTION NUMBER: ",OPT:DTIME
+	IF '$T!(OPT["^")!(OPT="") S OPT="^" Q
+	I (OPT<1)!(OPT>ITEMS) W !!,"OPTION NUMBER MUST BE "
+	I  W "BETWEEN 1 AND ",ITEMS G DISMENU1
+	Q
+DISMENU2	;
+	S XDESCR=$P($T(OPTIONS+II),";;",2)
+	I XDESCR'="" W !!,II,$P(XDESCR,"^",1)
+	Q
+OPTIONS	;
+	;;.....CREATE MAILING LIST ENTRY^^VECS6CR
+	;;.....EDIT MAILING LIST ENTRY^^VECS6ED
+	;;.....DELETE MAILING LIST ENTRY^^VECS6DEL
+	;;.....PRINT MAILING LIST ENTRIES^^VECS6PR
+
+VECS6PR
+VECS6PR	;LM/ATLANTA PARAGON
+	;;1
+	;VARIABLE LIST
+	;
+	;RECNR.....RECNR number assigned in CReate
+	;PAGE......Page number counter
+	;ANS.......response to prompt
+	;NODE......contents of ^VECS6G(RECNR,0) node
+	;OUT.......holds response: during display of 
+	;      multiple pages of output, user can press
+	;      Enter to continue or ^ to stop display
+	;POP.......holds response: when user is asked to
+	;      enter a device number, they can enter
+	;      a number, press Enter, or ^ to quit.  If
+	;      they enter ^, POP gets set to 1
+	;XDATE.....date in display format
+	;LCD.......date in internal format
+	;IN........input from the device prompt
+	;
+START	;
+	S PAGE=1,OUT=""
+	D OPEN G EXIT:POP
+	U IO
+	D HEADING
+	D ORDER
+	D CLOSE
+	R !,"Press Enter to go back to the menu",ANS:DTIME
+EXIT	;
+	K RECNR,PAGE,ANS,NODE,OUT,POP,LCD,XDATE,IN
+	Q
+HEADING	;
+	I PAGE>1,($E(IOST,1,2)="C-")
+	I  R !,"Press Enter to continue or ^ to exit",OUT:DTIME Q:'$T!(OUT["^")
+	W @IOF
+	W !!,?30,"MAILING LIST LISTING",?60,"PAGE ",PAGE
+	S PAGE=PAGE+1
+	Q
+ORDER	;
+	F RECNR=0:0 S RECNR=$O(^VECS6G(RECNR)) Q:RECNR'>0  D DISPLAY Q:OUT["^"
+	Q
+DISPLAY	;LINE 1
+	Q:'$D(^VECS6G(RECNR,0))
+	S NODE=^VECS6G(RECNR,0)
+	W !!!,$P(NODE,"^",1)
+	W ?40,"PHONE: ",$P(NODE,"^",6)
+LINE2	;
+	W !,$P(NODE,"^",2)
+LINE3	;
+	W !,$P(NODE,"^",3),?$X+2
+	W $P(NODE,"^",4),?$X+2
+	W $P(NODE,"^",5)
+	; WE WANT THE DATE PRINTED IN DISPLAY FORMAT MM/DD/YYYY
+	; NOT INTERNAL FORMAT YYYMMDD
+	S LCD=$P(NODE,"^",7)
+	I LCD="" S XDATE=""
+	I LCD'="" S XDATE=$E(LCD,4,5)_"/"_$E(LCD,6,7)_"/"_($E(LCD,1,3)+1700)
+	W ?40,XDATE
+	D:$Y+2>IOSL HEADING
+	Q
+OPEN	;
+	S %ZIS="M" D ^%ZIS
+	Q
+CLOSE	;
+	D ^%ZISC
+	Q
+
+VECS7CRI
+VECS7CRI	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;
+	;VARIABLE LIST
+	;
+	;NAME........Name as entered by the user
+	;RECNR......Record number
+	;DTIME.......Delay time (not to be KILLed)
+	;XDUP.........flag used to show that name entered is
+	; a duplicate (XDUP=1 means that record
+	; is a duplicate)
+	;BUSY........flag used to show that file is busy
+	; (BUSY=1 means the file is busy)
+	;OK..........flag used to show that the NAME is valid
+	; (OK=1 means NAME is valid)
+	;
+START	;
+	W @IOF
+	W !!,?20,"Create Mailing List Entry"
+ASK	;
+	R !!,"Enter NAME: ",NAME:DTIME I '$T!(NAME["^")!(NAME="") G EXIT
+	S OK=1,XDUP=0 D CHECK G:'OK!(XDUP) ASK
+	S BUSY=0 D ADD G:BUSY ASK
+	D ^VECS7FLD
+	G ASK
+EXIT	;
+	K OK,BUSY,XDUP,NAME,RECNR
+	Q
+ADD	;Create a new record
+	L +^VECS7G(0):5 I '$T W !,"File is busy, try again later." S BUSY=1 Q
+	;  There are a few changes in this paragraph other than
+	;  adding the code to create the "B" index.  A few of
+	;  the global references below have been coded using
+	;  the concept of naked references which is discussed
+	;  later in this lesson
+	I '$D(^VECS7G(0)) S ^(0)="MAILING LIST^1^0^0"
+	F RECNR=$P(^VECS7G(0),"^",3)+1:1 I '$D(^(RECNR)) Q
+	S $P(^VECS7G(0),"^",3,4)=RECNR_"^"_($P(^(0),"^",4)+1)
+	S ^VECS7G(RECNR,0)=NAME,^VECS7G("B",NAME,RECNR)="" L -^VECS7G(0)
+	W !,"Record # ",RECNR,!
+	Q
+CHECK	;
+	I NAME["""" S NAME=$P(NAME,"""",2) G CHKEXIT
+	I $D(^VECS7G("B",NAME)) W !,"Record with this name "
+	I  W "already exists, if you wish to add, enter name "
+	I  W "enclosed",!," in quotes",! S XDUP=1 Q
+CHKEXIT	;
+	I NAME'?1U.U1","1U.UP!($L(NAME)>30)!(NAME["?")
+	I  W !,"Enter the name of the desired entry.  "
+	I  W "Enter last name,first name.",! S OK=0
+	Q
+
+VECS7EDI
+VECS7EDI	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;NAME..........Name entered by user
+	;RECNR........Record number
+	;COUNT.........Number of matches to name user entered
+	;CHOICE........If there were duplicate names, number
+	; of choice user entered
+	;NAMES().......Array to hold duplicate names
+	;CH............Loop counter to number selections
+	;
+START	;
+	W @IOF
+	W !,?20,"Edit Mailing List Entries"
+ASK	;
+	R !!,"Select MAILING LIST NAME: ",NAME:DTIME
+	I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME'?1U.U1","1U.UP!($L(NAME)>30)!(NAME["?")
+	I  W !,"Enter the name of the desired entry.  "
+	I  W "Enter last name,first name.",! G ASK
+	D LOOKUP,^VECS7FLD:RECNR>0 G ASK
+EXIT	;
+	K NAME,CHOICE,CH,COUNT,NAMES,RECNR
+	Q
+LOOKUP	;
+	S COUNT=0
+	F RECNR=0:0 S RECNR=$O(^VECS7G("B",NAME,RECNR))  Q:RECNR'>0  DO MATCH
+	S CHOICE=""
+	I COUNT=1 S CHOICE=1
+	I COUNT>1 D CHOOSE
+	I $D(NAMES(+CHOICE)) S RECNR=NAMES(CHOICE)
+	I RECNR'>0 W $C(7),"  ??",!
+	Q
+MATCH	;
+	S COUNT=COUNT+1
+	S NAMES(COUNT)=RECNR,NAMES(COUNT,0)=^VECS7G(RECNR,0)
+	Q
+CHOOSE	;
+	F CH=1:1:COUNT W !,CH,") ",$P(NAMES(CH,0),"^",1),?40,$P(NAMES(CH,0),"^",6) I CH#5=0!(CH=COUNT) D REPLY Q:CHOICE'=""
+	Q
+REPLY	 ;
+	W !,"CHOOSE 1 - ",CH," or press RETURN to continue: "
+	R CHOICE:DTIME
+	; We want to see if the user entered an ^ or pressed the Enter 
+	; key.  To understand this "trick" we must remember that a null 
+	; in contained in EVERYTHING (even an "^")  That means, that
+	; ("^"[CHOICE) is the same thing as
+	; (CHOICE["^")!(CHOICE="")
+	;. 
+	I '$T!("^"[CHOICE) G CHEXIT
+	;
+	I '$D(NAMES(CHOICE)) W !,?10,"Must be a number "
+	I  W "from 1 through ",CH,!,$C(7) G REPLY
+CHEXIT	;
+	Q 
+
+VECS7FLD
+VECS7FLD	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;VARIABLE LIST
+	;RECNR.........Record number
+	;RECORD........copy of data node
+	;NAME..........Name as stored in the record
+	;OLDNAME.......Original name as stored in the record
+	;ADDR..........Address
+	;CITY..........City
+	;STATE.........State
+	;ZIP...........Zip code
+	;PHONE.........Phone number
+	;LCD...........Internal form of last contact date
+	;XDATE.......Display form of date as stored in node
+	;ANS...........User's answer to delete? questions
+	;INDATA........Holds users input before validation
+	;OK............Flag to designate if user is deleting 
+	; record (OK=1 says record is to be
+	; deleted)
+START	;
+	;Edit data fields
+	L +^VECS7G(RECNR,0):5
+	I '$T W !,"File is busy, try again later" Q
+	S RECORD=^VECS7G(RECNR,0)
+	S (OLDNAME,NAME)=$P(RECORD,"^",1),ADDR=$P(RECORD,"^",2)
+	S CITY=$P(RECORD,"^",3)
+	S STATE=$P(RECORD,"^",4),ZIP=$P(RECORD,"^",5)
+	S PHONE=$P(RECORD,"^",6)
+	S LCD=$P(RECORD,"^",7)
+	I LCD'="" S XDATE=$E(LCD,4,5)_"/"_$E(LCD,6,7)_"/"_($E(LCD,1,3)+1700)
+	I LCD="" S XDATE=""
+NAME	;
+	W !,"NAME: ",$S(NAME="":"",1:NAME_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" ADDR
+	I  W !,"City must not exceed 20 characters.",!,$C(7) G CITY
+	I INDATA="@" D DELETE I INDATA'="" G EXIT:OK,NAME
+	S NAME=INDATA
+ADDR	;
+	W !,"ADDRESS:  ",$S(ADDR="":"",1:ADDR_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" CITY
+	I INDATA'="@",INDATA'?.ANP!($L(INDATA)>25)!(INDATA["?")
+	I  W !,"Address must not exceed 25 characters.",!,$C(7) G ADDR
+	I INDATA="@" D DELFLD I INDATA'="" G ADDR
+	S ADDR=INDATA
+CITY	;
+	W !,"CITY:  ",$S(CITY="":"",1:CITY_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" STATE
+	I INDATA'="@",INDATA'?.ANP!($L(INDATA)>20)!(INDATA["?")
+	I  W !,"City must not exceed 20 characters.",!,$C(7) G CITY
+	I INDATA="@" D DELFLD I INDATA'="" G CITY
+	S CITY=INDATA
+STATE	;
+	W !,"STATE: ",$S(STATE="":"",1:STATE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" ZIP
+	I INDATA'="@",INDATA'?2U W !,"State must be a 2 character "
+	I  W "abbreviation.",!,$C(7) G STATE
+	I INDATA="@" D DELFLD I INDATA'="" G STATE
+	S STATE=INDATA
+ZIP	;
+	W !,"ZIP: ",$S(ZIP="":"",1:ZIP_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" PHONE
+	I INDATA'="@",INDATA'?5N&(INDATA'?9N) W !,"Zip must be five or "
+	I  W "nine digits, no hyphen.",!,$C(7) G ZIP
+	I INDATA="@" D DELFLD I INDATA'="" G ZIP
+	S ZIP=INDATA
+PHONE	;
+	W !,"PHONE: ",$S(PHONE="":"",1:PHONE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" LCD
+	I INDATA'="@",INDATA'?3N1"-"3N1"-"4N&(INDATA'?3N1"-"4N)
+	I  W !,"Phone must be entered with or without area code, using "
+	I  W "hyphens.",!,$C(7) G PHONE
+	I INDATA="@" D DELFLD I INDATA'="" G PHONE
+	S PHONE=INDATA
+LCD	;
+	W !,"LAST CONTACT DATE: ",$S(XDATE="":"",1:XDATE_"//")
+	R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" DATE
+	I INDATA'="@",INDATA'?2N1"/"2N1"/"4N W !,"Enter a date in the "
+	I  W "format of MM/DD/YYYY, where MM & DD are each two "
+	I  W "digits and YYYY is 4 digits.",!,$C(7) G LCD
+	I INDATA="@" D DELFLD G LCD:INDATA'="" I INDATA="" S LCD="" G EDEXIT
+DATE	;
+	S:INDATA'="" LCD=($E(INDATA,7,10)-1700)_$E(INDATA,1,2)_$E(INDATA,4,5)
+	S:INDATA=""&(XDATE'="") LCD=($E(XDATE,7,10)-1700)_$E(XDATE,1,2)_$E(XDATE,4,5)
+	I INDATA=""&(XDATE="") S LCD=""
+EDEXIT	;
+	S $P(^VECS7G(RECNR,0),"^",1,7)=NAME_"^"_ADDR_"^"_CITY_"^"_STATE_"^"_ZIP_"^"_PHONE_"^"_LCD
+	I OLDNAME'=NAME K ^VECS7G("B",OLDNAME,RECNR)
+	I  S ^VECS7G("B",NAME,RECNR)=""
+	L -^VECS7G(RECNR,0)
+EXIT	;
+	K NAME,ADDR,CITY,STATE,ZIP,PHONE,LCD,XDATE,ANS,INDATA
+	K OK,OLDNAME,RECNR,RECORD
+	Q
+DELFLD	;
+	R !,"Sure you wish to delete ? ",ANS:DTIME
+	I '$T!(ANS["^")!(ANS="") GOTO DELFEXIT
+	I (ANS="Y")!(ANS="YES") S INDATA=""
+	I  W "   ... <FIELD DELETED>"
+	E  W "   ... <FIELD NOT DELETED>"
+DELFEXIT	;
+	QUIT
+DELETE	;
+	L +^VECS7G(0):5
+	I '$T W !,"File is busy, try again later" Q
+	W !!,"Sure you want to delete the entire '",NAME,"' MAILING LIST ?"
+	R ANS:DTIME I '$T!(ANS["^")!(ANS="") G DELEXIT
+	I (ANS'="Y"),(ANS'="YES") W !," ... not deleted !",$C(7),! G DELEXIT
+	K ^VECS7G(RECNR),^VECS7G("B",NAME,RECNR)
+	S $P(^VECS7G(0),"^",4)=$P(^VECS7G(0),"^",4)-1 L -^VECS7G(0)
+	W !," '",NAME,"' DELETED !",! S OK=1
+DELEXIT	;
+	Q
+
+VECS7MNI
+VECS7MNI	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM;12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;SPECIAL VARIABLES USED IN VA:
+	;DTIME......Delay time (not to be KILLed)
+	;IOF........contains the codes to start output
+	;  at the top of a page or screen
+	;APPLICATION VARIABLES:
+	;OPT........Option number chosen by the user
+	;ROUTINE...Routine name for option chosen
+	;ITEMS.....Number of items in menu
+	;II........Menu loop counter
+	;XDESCR....Text for menu option
+START	;
+MAIN	;
+	D DISMENU
+	I OPT=""!(OPT["^") G EXIT
+	S ROUTINE=$P($T(OPTIONS+OPT),"^",2,3)
+	D @ROUTINE G MAIN
+EXIT	;
+	K OPT,ROUTINE,ITEMS,XDESCR,II
+	Q
+DISMENU	;
+	W @IOF
+	W !!!,?20,"MAILING LIST SYSTEM"
+	W !!,"OPTIONS    FUNCTIONS"
+	F II=1:1 D DISMENU2 Q:XDESCR=""
+	S ITEMS=II-1
+DISMENU1	;
+	R !!,"ENTER OPTION NUMBER: ",OPT:DTIME
+	Q:OPT=""!('$T)!(OPT["^")
+	I (OPT<1)!(OPT>ITEMS) W !!,"OPTION NUMBER MUST BE "
+	I  W "BETWEEN 1 AND ",ITEMS
+	I  R !!,?10,"Press RETURN to continue",OPT:DTIME G DISMENU1
+	Q
+DISMENU2	;
+	S XDESCR=$P($T(OPTIONS+II),";;",2)
+	I XDESCR'="" W !!,II,$P(XDESCR,"^",1)
+	Q
+OPTIONS	;
+	;;.....CREATE MAILING LIST ENTRY^^VECS7CRI
+	;;.....EDIT MAILING LIST ENTRY^^VECS7EDI
+	;;.....PRINT MAILING LIST ENTRIES^^VECS7PRI
+
+VECS7PRI
+VECS7PRI	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;VARIABLE LIST
+	;RECNR.....Record number assigned in Create
+	;PAGE......Page number counter
+	;IN........holds reponse:  during display of
+	;ANS.......holds repsonse to "Press enter to continue.."
+	;NODE......contents of ^VECS7G(RECNR,0) node
+	;OUT.......holds response: during display of
+	;  multiple pages of output, user can press
+	;  enter to continue or ^ to stop display
+	;POP.......holds response:  when user is asked to
+	;  enter a device number, they can enter
+	;  a number, press Enter, or ^ to quit.  If
+	;  they enter ^, POP gets set to 1
+	;XDATE.....Holds the display format of the date
+	;LCD.......Holds the internal format of the date
+	;
+START	;
+	S PAGE=1,OUT=""
+	D OPEN G EXIT:POP
+	U IO
+	D HEADING
+	D ORDER
+	D CLOSE
+	R !,"Press Enter to go back to the menu",ANS:DTIME
+EXIT	;
+	K RECNR,PAGE,IN,ANS,NODE,OUT,POP,LCD,XDATE
+	Q
+HEADING	;
+	I PAGE>1,($E(IOST,1,2)="C-")
+	I  R !,"Press Enter to continue ^ to exit",OUT:DTIME Q:'$T!(OUT["^")
+	W @IOF
+	W !!,?30,"MAILING LIST FILE LISTING",?60,"PAGE ",PAGE
+	S PAGE=PAGE+1
+	Q
+ORDER	;
+	F RECNR=0:0 S RECNR=$O(^VECS7G(RECNR)) Q:RECNR'>0  D DISPLAY Q:OUT["^"
+	Q
+DISPLAY	;LINE1
+	Q:'$D(^VECS7G(RECNR,0))
+	S NODE=^VECS7G(RECNR,0)
+	W !!!,$P(NODE,"^",1)
+	W ?40,"PHONE:  ",$P(NODE,"^",6)
+LINE2	;LINE 2
+	W !,$P(NODE,"^",2)
+LINE3	;LINE 3
+	W !,$P(NODE,"^",3),?$X+2
+	W $P(NODE,"^",4),?$X+2
+	W $P(NODE,"^",5)
+	;WE WANT THE DATE PRINTED IN DISPLAY FORMAT MM/DD/YYYY
+	;NOT INTERNAL FORMAT YYYMMDD
+	S LCD=$P(NODE,"^",7)
+	I LCD="" S XDATE=""
+	I LCD'="" S XDATE=$E(LCD,4,5)_"/"_$E(LCD,6,7)_"/"_($E(LCD,1,3)+1700)
+	W ?40,XDATE
+	D:$Y+2>IOSL HEADING
+	Q
+OPEN	;
+	S %ZIS="M" D ^%ZIS
+	Q
+	;
+CLOSE	;
+	D ^%ZISC
+	Q
+
+VECS81
+VECS81	;LESSON 8
+	;;1
+	SET A=15
+	SET B=20
+	DO SUB1
+	QUIT
+SUB1	;
+	NEW A
+	WRITE !,"THE VALUE OF A IS NOW: ",A
+	QUIT
+
+VECS82
+VECS82	;LESSON 8
+	;;1
+	SET A=15
+	SET B=20
+	DO SUB1
+	WRITE !,"AFTER SUB1, THE VALUE OF A IS: ",A
+	QUIT
+SUB1	;
+	NEW A
+	SET A="ABCDEF"
+	WRITE !,"IN SUB1, THE VALUE OF A IS NOW: ",A
+	WRITE !,"IN SUB1, THE VALUE OF B IS: ",B
+	QUIT
+
+VECS83
+VECS83	;LESSON 8
+	;;1
+	;VARIABLE LIST
+	;FIRST = Letter to search by
+	;  as entered by user
+	;BEFOREFR = Letter of the alphabet
+	;  that is before the 
+	;  letter entered by the
+	;  user
+	;NAME = NAME subscript
+	;RECNR = Record nr. subscript
+	;
+	READ !,"ENTER FIRST LETTER OF NAME: ",FIRST:DTIME
+	DO FIND
+	QUIT
+FIND	;
+	SET BEFOREFR=$A(FIRST)-1
+	SET NAME=$C(BEFOREFR)_"zzzz"
+	F X=1:1 S NAME=$O(^VECS8G("B",NAME)) Q:NAME](FIRST_"zzzz")!(NAME="")  DO DISPLAY
+	QUIT
+DISPLAY	;
+	SET RECNR=""
+	F X=1:1 S RECNR=$O(^VECS8G("B",NAME,RECNR)) Q:RECNR=""  DO DISP1
+	QUIT
+DISP1	;
+	WRITE !,"RECORD NUMBER OF ",NAME," IS ",RECNR
+	QUIT
+
+VECS8DT
+VECS8DT	;LCM;DATE UTILITY ROUTINE
+	;;1
+DATE	;
+	SET ERROR=0
+	READ !,"ENTER THE DATE: ",XDATE:DTIME
+	SET MON=$P(XDATE,"/",1)
+	SET XDAY=$P(XDATE,"/",2)
+	SET YR=$P(XDATE,"/",3)
+	IF MON<1!(MON>12) DO ERRMSG G DATE
+DAYS	;
+	D ERRMSG:$P("31,"_(YR#4=0+28)_",31,30,31,30,31,31,30,31,30,31",",",MON)<XDAY
+	G DATE:ERROR
+	QUIT
+ERRMSG	;
+	SET ERROR=1
+	WRITE !,"REENTER DATE"
+	QUIT
+
+VECS8ENT
+VECS8ENT	;LCM;04:19 PM  2 Dec 1989
+	;;1
+	;VARIABLE LIST
+	;
+	;FORCE.........Flag to indicate whether a record with
+	;  a duplicate name should be forced 
+	;  into the file; FORCE=1 means bypass
+	;  the lookup
+	;RECNR........Record number
+	;ANS...........User's response to a question
+	;NREC..........Record number with proper ending
+	;MOD...........Result of modulo division
+	;TEEN..........Record number is in the teens
+	;COUNT.........Counter of duplicate names
+	;CHOICE........User's choice from list of duplicates
+	;CH............Selection number on list of duplicates
+	;NAMES().......Local array which holds duplicate names
+	;BUSY..........Flag that indicates file is locked:
+	;  BUSY=1 when file is busy
+	;FORCE.........Flag that indicates whether a duplicate
+	;  record is being forced into the file:
+	;  FORCE=0 if record is NOT forced
+	;  FORCE=1 if record IS to be forced
+START	;
+	W @IOF
+ASK	;
+	NEW NAME,CHOICE,NREC,MOD,TEEN,COUNT,CH,BUSY,FORCE,ANS,RECNR
+	S (FORCE,RECNR)=0
+	R !!,"Select MAILING LIST NAME: ",NAME:DTIME
+	I '$T!(NAME["^")!(NAME="") G EXIT
+	I NAME["""" S NAME=$P(NAME,"""",2),FORCE=1
+	I NAME'?1U.U1","1U.UP!($L(NAME)>30)!(NAME["?")
+	I  W !,"Enter the name of the desired entry."
+	I  W "Enter last name,first name.",! G ASK
+	I 'FORCE D LOOKUP I CHOICE="" G ASK
+	I RECNR'>0 D CREATE I RECNR'>0 W $C(7)," ??" G ASK
+	D ^VECS8FLD G ASK
+EXIT	;
+	Q
+LOOKUP	;
+	S COUNT=0
+	F RECNR=0:0 S RECNR=$O(^VECS8G("B",NAME,RECNR)) Q:RECNR'>0  I $D(^VECS8G(RECNR,0)),$P(^VECS8G(RECNR,0),"^",1)=NAME D MATCH
+	S CHOICE=""
+	I COUNT=0 S CHOICE="None" Q
+	I COUNT=1 S CHOICE=1
+	I COUNT>1 D CHOOSE
+	I $D(NAMES(+CHOICE)) S RECNR=NAMES(CHOICE)
+	K NAMES
+	Q
+MATCH	;
+	S COUNT=COUNT+1
+	S NAMES(COUNT)=RECNR,NAMES(COUNT,0)=^VECS8G(RECNR,0)
+	Q
+CHOOSE	;
+	F CH=1:1:COUNT W !,CH,")",$P(NAMES(CH,0),"^",1),?40,$P(NAMES(CH,0),"^",6) I CH#5=0!(CH=COUNT) D REPLY Q:CHOICE'=""
+	Q
+REPLY	;
+	W !,"CHOOSE 1 - ",CH,": " R CHOICE:DTIME
+	I '$T!("^"[CHOICE) G CHEXIT
+	I '$D(NAMES(CHOICE)) W !,?10,"Must be a number "
+	I  W "from 1 through ",CH,!,$C(7) G REPLY
+CHEXIT	;
+	Q
+CREATE	;Create a new record
+	S NREC=$S($D(^VECS8G(0)):$P(^VECS8G(0),"^",4)+1,1:1),MOD=NREC#10,TEEN=NREC#100>10&(NREC#100<20)
+	S NREC=NREC_$S(TEEN:"TH",1:$P("TH^ST^ND^RD^TH^TH^TH^TH^TH^TH","^",MOD+1))
+ASKCR	;
+	W $C(7),!?4,"ARE YOU ADDING '",NAME,"' AS A NEW MAILING LIST (THE ",NREC,")? "
+	R ANS:DTIME I '$T!(ANS="^") G CREXIT
+	I ANS=""!("NnYy"'[$E(ANS)) W $C(7),"  ??" G ASKCR
+	I "Yy"[$E(ANS) D ADD
+CREXIT	;
+	Q
+ADD	;
+	L ^VECS8G(0):5 I '$T W !,"File is busy, try again later." S BUSY=1 Q
+	I '$D(^VECS8G(0)) S ^VECS8G(0)="MAILING LIST^1^0^0"
+	F RECNR=$P(^VECS8G(0),"^",3)+1:1 I '$D(^VECS8G(RECNR)) Q
+	S $P(^VECS8G(0),"^",3,4)=RECNR_"^"_($P(^VECS8G(0),"^",4)+1)
+	S ^VECS8G(RECNR,0)=NAME,^VECS8G("B",NAME,RECNR)="" L
+	W !,"Record # ",RECNR,!
+	Q
+
+VECS8FLD
+VECS8FLD	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;VARIABLE LIST
+	;RECNR.........Record number
+	;RECORD........copy of data node
+	;NAME..........Name as stored in the record
+	;OLDNAME.......Original name as stored in the record
+	;ADDR..........Address
+	;CITY..........City
+	;STATE.........State
+	;ZIP...........Zip code
+	;PHONE.........Phone number
+	;LCD...........Internal form of last contact date
+	;YDATE.......Display form of date as stored in node
+	;ANS...........User's answer to delete? questions
+	;INDATA........Holds users input before validation
+	;OK............Flag to designate if user is deleting 
+	;  record (OK=1 says record is to be
+	;  deleted)
+	;Edit data fields
+START	;
+	N RECORD,ADDR,CITY,STATE,ZIP,PHONE,LCD,YDATE,ANS,INDATA,OK,NAME,OLDNAME
+	L +^VECS8G(RECNR,0):5
+	I '$T W !,"File is busy, try again later" Q
+	S RECORD=^VECS8G(RECNR,0)
+	S (OLDNAME,NAME)=$P(RECORD,"^",1),ADDR=$P(RECORD,"^",2)
+	S CITY=$P(RECORD,"^",3)
+	S STATE=$P(RECORD,"^",4),ZIP=$P(RECORD,"^",5)
+	S PHONE=$P(RECORD,"^",6)
+	S LCD=$P(RECORD,"^",7)
+	I LCD'="" S YDATE=$E(LCD,4,5)_"/"_$E(LCD,6,7)_"/"_($E(LCD,2,3)+1700)
+	I LCD="" S YDATE=""
+NAME	;
+	W !,"NAME: ",$S(NAME="":"",1:NAME_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" ADDR
+	I INDATA'="@",INDATA'?1U.U1","1U.UP!($L(INDATA)>30)!(INDATA["?")
+	I  W !,"Enter the name of the desired entry. "
+	I  W "Enter last name,first name.",! G NAME
+	I INDATA="@" S OK=0 D DELETE G EXIT:OK,NAME
+	S NAME=INDATA
+ADDR	;
+	W !,"ADDRESS: ",$S(ADDR="":"",1:ADDR_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" CITY
+	I INDATA'="@",INDATA'?.ANP!($L(INDATA)>25)!(INDATA["?")
+	I  W !,"Address must not exceed 25 characters.",!,$C(7) G ADDR
+	I INDATA="@" D DELFLD I INDATA'="" G ADDR
+	S ADDR=INDATA
+CITY	;
+	W !,"CITY: ",$S(CITY="":"",1:CITY_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" STATE
+	I INDATA'="@",INDATA'?.ANP!($L(INDATA)>20)!(INDATA["?")
+	I  W !,"City must not exceed 20 characters.",!,$C(7) G CITY
+	I INDATA="@" D DELFLD I INDATA'="" G CITY
+	S CITY=INDATA
+STATE	;
+	W !,"STATE: ",$S(STATE="":"",1:STATE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" ZIP
+	I INDATA'="@",INDATA'?2U W !,"State must be a 2 character "
+	I  W "abbreviation.",!,$C(7) G STATE
+	I INDATA="@" D DELFLD I INDATA'="" G STATE
+	S STATE=INDATA
+ZIP	;
+	W !,"ZIP: ",$S(ZIP="":"",1:ZIP_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" PHONE
+	I INDATA'="@",INDATA'?5N&(INDATA'?9N) W !,"Zip must be five or "
+	I  W "nine digits, no hyphen.",!,$C(7) G ZIP
+	I INDATA="@" D DELFLD I INDATA'="" G ZIP
+	S ZIP=INDATA
+PHONE	;
+	W !,"PHONE: ",$S(PHONE="":"",1:PHONE_"//") R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" LCD
+	I INDATA'="@",INDATA'?3N1"-"3N1"-"4N&(INDATA'?3N1"-"4N)
+	I  W !,"Phone must be entered with or without area code, using "
+	I  W "hyphens.",!,$C(7) G PHONE
+	I INDATA="@" D DELFLD I INDATA'="" G PHONE
+	S PHONE=INDATA
+LCD	;
+	W !,"LAST CONTACT DATE: ",$S(YDATE="":"",1:YDATE_"//")
+	R INDATA:DTIME
+	I '$T!(INDATA["^") G EDEXIT
+	G:INDATA="" DATE
+	I INDATA'="@",INDATA'?2N1"/"2N1"/"4N W !,"Enter a date in the "
+	I  W "format of MM/DD/YYYY, where MM & DD are each two "
+	I  W "digits and YYYY is 4 digits.",!,$C(7) G LCD
+	I INDATA="@" D DELFLD I INDATA'="" G LCD
+DATE	;
+	S:INDATA'="" LCD=($E(INDATA,7,10)-1700)_$E(INDATA,1,2)_$E(INDATA,4,5)
+EDEXIT	;
+	S $P(^VECS8G(RECNR,0),"^",1,7)=NAME_"^"_ADDR_"^"_CITY_"^"_STATE_"^"_ZIP_"^"_PHONE_"^"_LCD
+	I OLDNAME'=NAME K ^VECS8G("B",OLDNAME,RECNR)
+	I  S ^VECS8G("B",NAME,RECNR)=""
+	L -^VECS8G(RECNR,0)
+EXIT	;
+	Q
+DELFLD	;
+	R !,"Sure you wish to delete ? ",ANS:DTIME
+	I '$T!(ANS["^")!(ANS="") GOTO DELFEXIT
+	I (ANS="Y")!(ANS="YES") S INDATA=""
+	I  W "  ... <FIELD DELETED>"
+	E  W "  ... <FIELD NOT DELETED>"
+DELFEXIT	;
+	QUIT
+DELETE	;
+	W !!,"Sure you want to delete the entire '",NAME,"' MAILING LIST ? "
+	R ANS:DTIME I '$T!(ANS["^")!(ANS="") G DELEXIT
+	I (ANS'="Y"),(ANS'="YES") W !," ... not deleted !",$C(7),!
+	I  G DELEXIT
+	K ^VECS8G(RECNR),^VECS8G("B",NAME,RECNR)
+	L ^VECS8G(0):5
+	I '$T W !,"File is busy, try again later" Q
+	S $P(^VECS8G(0),"^",4)=$P(^VECS8G(0),"^",4)-1 L
+	W !," '",NAME,"' DELETED !",! S OK=1
+DELEXIT	; 
+	Q
+
+VECS8MN
+VECS8MN	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;SPECIAL VARIABLES USED IN VA:
+	;  DTIME.....Delay time (not to be KILLed)
+	;  IOF.......contains the codes to start output
+	;     at the top of a page or screen
+	;APPLICATION VARIABLES:
+	;  OPT.......Option number chosen by the user
+	;  ROUTINE...Routine name for option chosen
+	;  ITEMS.....Number of items in menu
+	;  II........Menu loop counter
+	;  XDESCR.....Text for menu option
+MAIN	;
+	D DISMENU
+	I OPT=""!(OPT["^") G EXIT
+	S ROUTINE=$P($T(OPTIONS+OPT),"^",2,3)
+	D @ROUTINE G MAIN
+EXIT	;
+	K OPT,ROUTINE,ITEMS,XDESCR,II
+	Q
+DISMENU	;
+	W @IOF
+	W !!!,?20,"MAILING LIST SYSTEM"
+	W !!,"OPTIONS     FUNCTIONS"
+	F II=1:1 D DISMENU2 Q:XDESCR=""
+	S ITEMS=II-1
+DISMENU1	;
+	R !!,"ENTER OPTION NUMBER:  ",OPT:DTIME
+	Q:OPT=""!('$T)!(OPT["^")
+	I (OPT<1)!(OPT>ITEMS) W !!,"OPTION NUMBER MUST BE "
+	I  W "BETWEEN 1 AND ",ITEMS
+	I  R !!,?10,"Press RETURN to continue",OPT:DTIME G DISMENU1
+	Q
+DISMENU2	;
+	S XDESCR=$P($T(OPTIONS+II),";;",2)
+	I XDESCR'="" W !!,II,$P(XDESCR,"^",1)
+	Q
+OPTIONS	;
+	;;.....ENTER OR EDIT MAILING LIST ENTRY^^VECS8ENT
+	;;.....PRINT MAILING LIST ENTRIES^^VECS8PRI
+
+VECS8PRI
+VECS8PRI	;ATL/ACE PROGRAMMER--MAILING LIST SYSTEM; 12/1/90
+	;;1
+	;VARIABLE LIST
+	;RECNR.....Record number assigned in Create
+	;PAGE......Page number counter
+	;IN........holds reponse:  during display of
+	;ANS.......holds repsonse to "Press enter to continue.."
+	;NODE......contents of ^VECS8G(RECNR,0) node
+	;OUT.......holds response: during display of
+	;  multiple pages of output, user can press
+	;  enter to continue or ^ to stop display
+	;POP.......holds response:  when user is asked to
+	;  enter a device number, they can enter
+	;  a number, press Enter, or ^ to quit.  If
+	;  they enter ^, POP gets set to 1
+	;XDATE.....Holds the display format of the date
+	;LCD.......Holds the internal format of the date
+	;
+START	;
+	S PAGE=1,OUT=""
+	D OPEN G EXIT:POP
+	U IO
+	D HEADING
+	D ORDER
+	D CLOSE
+	R !,"Press Enter to go back to the menu",ANS:DTIME
+EXIT	;
+	K RECNR,PAGE,IN,ANS,NODE,OUT,POP,LCD,XDATE
+	Q
+HEADING	;
+	I PAGE>1,($E(IOST,1,2)="C-")
+	I  R !,"Press Enter to continue ^ to exit",OUT:DTIME Q:'$T!(OUT["^")
+	W @IOF
+	W !!,?30,"MAILING LIST FILE LISTING",?60,"PAGE ",PAGE
+	S PAGE=PAGE+1
+	Q
+ORDER	;
+	F RECNR=0:0 S RECNR=$O(^VECS8G(RECNR)) Q:RECNR'>0  D DISPLAY Q:OUT["^"
+	Q
+DISPLAY	;LINE1
+	Q:'$D(^VECS8G(RECNR,0))
+	S NODE=^VECS8G(RECNR,0)
+	W !!!,$P(NODE,"^",1)
+	W ?40,"PHONE:  ",$P(NODE,"^",6)
+LINE2	;LINE 2
+	W !,$P(NODE,"^",2)
+LINE3	;LINE 3
+	W !,$P(NODE,"^",3),?$X+2
+	W $P(NODE,"^",4),?$X+2
+	W $P(NODE,"^",5)
+	;WE WANT THE DATE PRINTED IN DISPLAY FORMAT MM/DD/YYYY
+	;NOT INTERNAL FORMAT YYYMMDD
+	S LCD=$P(NODE,"^",7)
+	I LCD="" S XDATE=""
+	I LCD'="" S XDATE=$E(LCD,4,5)_"/"_$E(LCD,6,7)_"/"_($E(LCD,1,3)+1700)
+	W ?40,XDATE
+	D:$Y+2>IOSL HEADING
+	Q
+OPEN	;
+	S %ZIS="M" D ^%ZIS
+	Q
+	;
+CLOSE	;
+	D ^%ZISC
+	Q
+
+VECS8SET
+VECS8SET	;LESSON 8
+	;;1
+	SET ^VECST1="/AL/AK/AZ/CA/CO/CT/"
+	SET ^VECST2="/DE/DC/FL/"
+	QUIT
+
+VECS8STA
+VECS8STA	;LCM;STATE ROUTINE
+	;;1
+STATE	;
+	READ !,"ENTER STATE CODE: ",STATE:DTIME
+	DO CHECK
+	IF ERROR GOTO STATE
+	QUIT
+CHECK	;
+	SET ERROR=0
+	SET STATE1="/"_STATE_"/"
+	IF ^VECST1[STATE1 QUIT
+	IF ^VECST2[STATE1 QUIT
+	WRITE !,"STATE CODE NOT VALID!! TRY AGAIN."
+	SET ERROR=1
+	QUIT
+
+

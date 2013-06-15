@@ -1,0 +1,679 @@
+Saved by %RS from [TRN,STU] on  9-SEP-2000 15:01:29.94
+Beginner M routines
+MCD101
+VECS145	;ATL/ACE PROGRAMMER-COMPARISON PROGRAM
+	;;1
+	;     VARIABLE LIST
+	;
+	;     PURPRICE   =   PURCHASE PRICE (from input)
+	;     INT        =   INTEREST RATE (from input)
+	;     TIME       =   TIME PERIOD (from input)
+	;     FINCOST    =   FINANCE COST (calculated)
+	;     PURCOST    =   PURCHASE COST (calculated)
+	;     MONCOST    =   MONTHLY LEASE COST (from input)
+	;     NRPAYM     =   NUMBER OF PAYMENTS (from input)
+	;     LUMP       =   LUMP SUM PAYMENT (from input)
+	;     TLEASE     =   TOTAL LEASE PAYMENTS (calculated)
+	;     TLEASEPUR  =   TOTAL LEASE-PURCHASE COST (calc.)
+	;     ANSWER     =   ANSWER TO "ANOTHER?" PROMPT (from input)
+INPUT	;
+	WRITE !,"THE PURCHASE OPTION"
+	READ !!,"ENTER PURCHASE PRICE:  ",PURPRICE
+	READ !,"ENTER INTEREST RATE:  ",INT
+	READ !,"ENTER TIME PERIOD:  ",TIME
+	SET FINCOST=PURPRICE*INT*TIME
+	SET PURCOST=PURPRICE+FINCOST
+	WRITE !!," THE TOTAL PURCHASE COST IS $",PURCOST
+LEASE	;
+	WRITE !!,"THE LEASE-PURCHASE OPTION"
+	READ !,"ENTER MONTLY LEASE COST:  ",MONCOST
+	READ !,"ENTER NUMBER OF PAYMENTS:  ",NRPAYM
+	READ !,"ENTER LUMP SUM:  ",LUMP
+	SET TLEASE=MONCOST*NRPAYM
+	SET TLEASPUR=TLEASE+LUMP
+	WRITE !!,"THE TOTAL COST OF LEASE-PURCHASE IS $",TLEASPUR
+DECISION	;
+	IF PURCOST>TLEASPUR WRITE !!,"LEASE IT"
+	IF TLEASPUR>PURCOST WRITE !!,"PURCHASE IT"
+	IF TLEASPUR=PURCOST WRITE !!,"IT DOESN'T MATTER"
+CHECK	;
+	READ !,"DO YOU WANT TO DO ANOTHER?  YES//",ANSWER
+	IF ANSWER="" GOTO INPUT
+	IF ANSWER="YES" GOTO INPUT
+	IF ANSWER="Y" GOTO INPUT
+EXIT	;
+	KILL PURPRICE,INT,TIME,FINCOST,PURCOST,MONCOST,NRPAYM
+	KILL LUMP,TLEASE,TLEASPUR,ANSWER
+	QUIT
+
+VECS233
+VECS233	;ATL/ACE PROGRAMMER-TEMPERATURE CONVERSION ;1/1/90
+	;;1
+	;     Variable List
+	;
+	;     DTIME.........Delay time for READ (since it is a special
+	;                   VA variable, it is not to be KILLed)
+	;     TEMP.........Converted temperature
+	;     XDEGREES.......degrees input by user
+	;     ANS............answer to "Do you want to do another?"
+	;     CODE...........user's menu choice number
+	;
+BEGIN	;
+	READ !!,"Enter number of degrees: ",XDEGREES:DTIME
+	IF '$T!(XDEGREES["^") GOTO EXIT
+MENU	;
+	WRITE !!,"Enter 1 for Fahrenheit to Celsius"
+	WRITE !,"Enter 2 for Celsius to Fahrenheit"
+	READ !,CODE:DTIME IF '$T!(CODE["^") GOTO EXIT
+	IF CODE<1!(CODE>2) WRITE !,"Enter 1 or 2" GOTO MENU
+PICK	;
+	DO FTOC:CODE=1,CTOF:CODE=2
+AGAIN	;
+	;  Below we have used the Lesson 1 way of ending
+	;  a program
+	;
+	READ !,"Do you want to do another? YES//",ANS:DTIME
+	IF '$T!(ANS["^") GOTO EXIT
+	GOTO BEGIN:(ANS="")!(ANS="YES")!(ANS="Y")
+	GOTO EXIT
+FTOC	;
+	SET TEMP=(XDEGREES-32)*5/9
+	WRITE !!,"Celsius temperature is: ",TEMP
+	QUIT
+CTOF	;
+	SET TEMP=XDEGREES*(9/5)+32
+	WRITE !!,"Fahrenheit temperature is: ",TEMP
+	QUIT
+EXIT	;
+	KILL TEMP,XDEGREES,ANS,CODE
+	QUIT
+
+VECS235
+VECS235	;ATL/ACE PROGRAMMER-HEALTH CLUB MEMBERSHIP ;1/1/90
+	;;1
+	;          Variable List
+	;
+	;     NAME.........Member's name
+	;     DTIME........Delay time for READ (not to be KILLed)
+	;     TYPE.........Type of membership
+	;     XDESCR........TYPE converted to words
+	;     AGE..........Age of member
+	;     XDAYS.........Nr. of days facility used
+	;     RATE.........Rate from table
+	;     AMOUNT.......Total amount to be paid
+BEGIN	;
+	WRITE !!,"Enter member's name or"
+	READ !,"Press Enter to quit: ",NAME:DTIME
+	IF '$T!(NAME["^") GOTO EXIT
+	GOTO EXIT:NAME=""
+TYPE	;
+	WRITE !!,"Enter type of membership"
+	READ !,"A=all facilities, P=pool only: ",TYPE:DTIME
+	IF '$T!(TYPE["^") GOTO EXIT
+	SET XDESCR=$S(TYPE="A":"all",TYPE="P":"pool",1:"ERROR")
+	IF XDESCR="ERROR" WRITE !,"Reenter" GOTO TYPE
+AGE	;
+	READ !,"Enter age: ",AGE:DTIME
+	IF '$T!(AGE["^") GOTO EXIT
+DAYS	;
+	READ !,"Enter days the facility was used: ",XDAYS:DTIME
+	IF '$T!(XDAYS["^") GOTO EXIT
+RATE	;
+	IF AGE'>18&(TYPE="A") SET RATE=14
+	IF AGE>18&(TYPE="A") SET RATE=16
+	IF AGE'>18&(TYPE="P") SET RATE=9
+	IF AGE>18&(TYPE="P") SET RATE=11
+CALC	;
+	SET AMOUNT=XDAYS*RATE
+OUTPUT	;
+	WRITE !!,"The charge for ",NAME,"'s membership is $",AMOUNT
+	WRITE !,"which covers their use of ",XDESCR," facilities"
+	GOTO BEGIN
+EXIT	;
+	KILL AMOUNT,XDAYS,RATE,XDESCR,TYPE,AGE,NAME
+	QUIT
+
+VECS313
+VECS313	;ATL/ACE PROGRAMMER-EXERCISE PLAN;2/1/90
+	;;1
+	;     VARIABLE LIST
+	;
+	;     RECNR.......record number being processed
+	;     RECORD......record pulled from text line in DATA
+	;     ACTIV.......activity description
+	;     CAL.........calories expended per minute
+	;     MIN15.......calories expended in 15 min.
+	;     MIN30.......calories expended in 30 min.
+	;     MIN60.......calories expended in 60 min.
+	;
+INIT	;
+	SET RECNR=1
+HEADING	;
+	WRITE !,?24,"JOE'S GYM"
+	WRITE !,?13,"EXERCISE PLAN--CALORIES BURNED"
+	WRITE !!,"ACTIVITY",?20,"15 MIN",?35,"30 MIN",?50,"60 MIN",!!
+INPUT	;
+	SET RECORD=$PIECE($TEXT(DATA+RECNR),";;",2)
+	IF RECORD="" GOTO EXIT
+	SET ACTIV=$PIECE(RECORD,"^",1)
+	SET CAL=$PIECE(RECORD,"^",2)
+CALC	;
+	SET MIN15=CAL*15
+	SET MIN30=CAL*30
+	SET MIN60=CAL*60
+OUTPUT	;
+	WRITE !,ACTIV,?20,MIN15,?35,MIN30,?50,MIN60
+	SET RECNR=RECNR+1
+	GOTO INPUT
+EXIT	;
+	WRITE !!,"Keep active, stay healthy!!!"
+	KILL CAL,MIN15,MIN30,MIN60,RECNR,RECORD,ACTIV
+	QUIT
+DATA	;
+	;;BOXING^13.3
+	;;WALKING UP STAIRS^10
+	;;RUNNING 5 MPH^10
+	;;ARCHERY^5
+	;;WALKING 4 MPH^7
+	;;SLEEPING^2.3
+	;;JOGGING^15.0
+	;;SITTING^1.7
+
+VECS316
+VECS316	;ATL/ACE PROGRAMMER-INVENTORY REPORT ;2/1/90
+	;;1
+	;VARIABLE LIST
+	;RECNR.......record being processed
+	;RECORD......record pulled from text line in DATA
+	;FTOTAL......final total (accumulator)
+	;TOTITEMS....total nr. of items (counter)
+	;XDEPT........dept. number
+	;ITEM........item description
+	;QTY.........quantity
+	;UNITPR......unit price
+	;TOTAL.......total price per item (calculated)
+INIT	;
+	SET RECNR=1,FTOTAL=0,TOTITEMS=0
+HEADING	;
+	WRITE !,?30,"The Paper Warehouse"
+	WRITE !,?32,"Inventory Report"
+	WRITE !!,"DEPT",?10,"ITEM",?30,"QTY",?40,"UNIT PRICE",?55,"TOTAL PRICE",!!
+INPUT	;
+	SET RECORD=$PIECE($TEXT(DATA+RECNR),";;",2)
+	IF RECORD="" GOTO EXIT
+	SET XDEPT=$PIECE(RECORD,"^",1)
+	SET ITEM=$PIECE(RECORD,"^",2)
+	SET QTY=$PIECE(RECORD,"^",3)
+	SET UNITPR=$PIECE(RECORD,"^",4)
+CALC	;
+	SET TOTAL=QTY*UNITPR
+	SET FTOTAL=FTOTAL+TOTAL ; add to accumulator
+	SET TOTITEMS=TOTITEMS+1 ; add to counter
+OUTPUT	;
+	WRITE !,XDEPT,?10,ITEM,?30,QTY,?40,UNITPR,?55,TOTAL
+	SET RECNR=RECNR+1
+	GOTO INPUT
+EXIT	;
+	WRITE !!,?38,"Final total is $",?55,FTOTAL
+	WRITE !!,"Total number of items is ",TOTITEMS
+	KILL TOTAL,FTOTAL,TOTITEMS,UNITPR,XDEPT,ITEM,QTY,RECNR,RECORD
+	QUIT
+DATA	;
+	;;01^Yellow paper pads^5^2.95
+	;;01^Pencils^15^.25
+	;;01^Erasers^2^1
+	;;02^Picture frames^1^8
+	;;02^Picture wire^5^2.95
+	;;02^Picture hangers^20^3.75
+
+VECS320
+VECS320	;ATL/ACE PROGRAMMER-INVENTORY REPORT ;2/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;RECNR.......record being processed
+	;RECORD......record pulled from text line in DATA
+	;FTOTAL......final total
+	;TOTITEMS....total nr. of items
+	;XDEPT........dept. number
+	;ITEM........item description
+	;QTY.........quantity
+	;UNITPR......unit price
+	;TOTAL.......total price per item (calculated)
+INIT	;
+	SET RECNR=1,FTOTAL=0,TOTITEMS=0
+HEADING	;
+	WRITE !,?30,"The Paper Warehouse"
+	WRITE !,?32,"Inventory Report"
+	WRITE !!,"DEPT",?10,"ITEM",?30,"QTY",?40,"UNIT PRICE",?55,"TOTAL PRICE",!!
+INPUT	;
+	SET RECORD=$PIECE($TEXT(DATA+RECNR),";;",2)
+	IF RECORD="" GOTO EXIT
+	SET XDEPT=$PIECE(RECORD,"^",1)
+	SET ITEM=$PIECE(RECORD,"^",2)
+	SET QTY=$PIECE(RECORD,"^",3)
+	SET UNITPR=$PIECE(RECORD,"^",4)
+CALC	;
+	SET TOTAL=QTY*UNITPR
+	SET FTOTAL=FTOTAL+TOTAL
+	SET TOTITEMS=TOTITEMS+1
+OUTPUT	;
+	WRITE !,XDEPT,?10,ITEM,?30,$JUSTIFY(QTY,3),?40
+	WRITE $JUSTIFY(UNITPR,5,2),?55,$JUSTIFY(TOTAL,6,2)
+	SET RECNR=RECNR+1
+	GOTO INPUT
+EXIT	;
+	WRITE !,?38,"Final total is $",?54,$JUSTIFY(FTOTAL,7,2)
+	WRITE !!,"Total number of items is ",TOTITEMS
+	KILL TOTAL,FTOTAL,TOTITEMS,UNITPR,XDEPT,ITEM,QTY,RECNR,RECORD
+	QUIT
+DATA	;
+	;;01^Yellow paper pads^5^2.95
+	;;01^Pencils^15^.25
+	;;01^Erasers^2^1
+	;;02^Picture frames^1^8
+	;;02^Picture wire^5^2.95
+	;;02^Picture hangers^20^3.75
+
+VECS321
+VECS321	;ATL/ACE PROGRAMMER-INVENTORY REPORT ;2/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;RECNR.......record being processed
+	;RECORD......record pulled from text line in DATA
+	;FTOTAL......final total
+	;TOTITEMS....total nr. of items
+	;XDEPT........dept. number
+	;ITEM........item description
+	;QTY.........quantity
+	;UNITPR......unit price
+	;TOTAL.......total price per item (calculated)
+INIT	;
+	SET RECNR=1,FTOTAL=0,TOTITEMS=0
+HEADING	;
+	WRITE !,?30,"The Paper Warehouse"
+	WRITE !,?32,"Inventory Report"
+	WRITE !!,"DEPT",?10,"ITEM",?30,"QTY",?40,"UNIT PRICE",?55,"TOTAL PRICE",!!
+INPUT	;
+	SET RECORD=$PIECE($TEXT(DATA+RECNR),";;",2)
+	IF RECORD="" GOTO EXIT
+	SET XDEPT=$PIECE(RECORD,"^",1)
+	SET ITEM=$PIECE(RECORD,"^",2)
+	SET QTY=$PIECE(RECORD,"^",3)
+	SET UNITPR=$PIECE(RECORD,"^",4)
+CALC	;
+	SET TOTAL=QTY*UNITPR
+	SET FTOTAL=FTOTAL+TOTAL
+	SET TOTITEMS=TOTITEMS+1
+OUTPUT	;
+	WRITE !,XDEPT,?10,ITEM,?30,$J($FN(QTY,"P,"),8),?40
+	WRITE $J($FN(UNITPR,"P,",2),9),?55,$J($FN(TOTAL,"P,",2),11)
+	SET RECNR=RECNR+1
+	GOTO INPUT
+EXIT	;
+	WRITE !,?38,"Final total is $",?55,$J($FN(FTOTAL,"P,",2),11)
+	WRITE !!,"Total number of items is ",TOTITEMS
+	KILL TOTAL,FTOTAL,TOTITEMS,UNITPR,XDEPT,ITEM,QTY,RECNR,RECORD
+	QUIT
+DATA	;
+	;;01^Yellow paper pads^500^2.95
+	;;01^Pencils^1520^.25
+	;;01^Erasers^2989^1
+	;;02^Picture frames^1000^8
+	;;02^Picture wire^-50^2.95
+	;;02^Picture hangers^20000^3.75
+
+VECS322
+VECS322	;ATL/ACE PROGRAMMER-INVENTORY REPORT ;2/1/90
+	;;1
+	;     VARIABLE LIST
+	;     RECNR.......record being processed
+	;     RECORD......record pulled from text line in DATA
+	;     FTOTAL......final total
+	;     TOTITEMS....total nr. of items
+	;     CURRDEPT....dept. number of current record's dept. nr.
+	;     ITEM........item description
+	;     QTY.........quantity
+	;     UNITPR......unit price
+	;     TOTAL.......total price per item (calculated)
+	;     PREVDEPT....a temporary variable that holds the 
+	;               previous record's department number
+	;     SUBTOT......subtotal for current department
+INIT	;
+	SET RECNR=1,FTOTAL=0,TOTITEMS=0,SUBTOT=0
+HEADING	;
+	WRITE !,?30,"The Paper Warehouse"
+	WRITE !,?32,"Inventory Report"
+	WRITE !!,"DEPT",?10,"ITEM",?30,"QTY",?40,"UNIT PRICE",?55,"TOTAL PRICE",!!
+INPUT	;
+	SET RECORD=$PIECE($TEXT(DATA+RECNR),";;",2)
+	IF RECORD="" GOTO EXIT
+	SET CURRDEPT=$PIECE(RECORD,"^",1)
+	SET ITEM=$PIECE(RECORD,"^",2)
+	SET QTY=$PIECE(RECORD,"^",3)
+	SET UNITPR=$PIECE(RECORD,"^",4)
+	IF RECNR=1 SET PREVDEPT=CURRDEPT
+	IF PREVDEPT'=CURRDEPT DO SUBT
+	SET PREVDEPT=CURRDEPT
+CALC	;
+	SET TOTAL=QTY*UNITPR
+	SET SUBTOT=SUBTOT+TOTAL
+	SET FTOTAL=FTOTAL+TOTAL
+	SET TOTITEMS=TOTITEMS+1
+OUTPUT	;
+	WRITE !,CURRDEPT,?10,ITEM,?30,$J($FN(QTY,","),6),?40
+	WRITE $J($FN(UNITPR,"P,",2),9),?55,$J($FN(TOTAL,"P,",2),11)
+	SET RECNR=RECNR+1
+	GOTO INPUT
+SUBT	;
+	WRITE !!,?21,"Subtotal for this department is $",?55,$J($FN(SUBTOT,"P,",2),11),!!
+	SET SUBTOT=0
+	QUIT
+EXIT	;
+	DO SUBT
+	WRITE !,?38,"Final total is $",?55,$J($FN(FTOTAL,"P,",2),11)
+	WRITE !!,"Total number of items is ",TOTITEMS
+	KILL TOTAL,FTOTAL,TOTITEMS,UNITPR,CURRDEPT,ITEM,QTY,RECNR,RECORD
+	KILL SUBTOT,PREVDEPT
+	QUIT
+DATA	;
+	;;01^Yellow paper pads^5^2.95
+	;;01^Pencils^15^.25
+	;;01^Erasers^2^1
+	;;02^Picture frames^1^8
+	;;02^Picture wire^5^2.95
+	;;02^Picture hangers^20^3.75
+
+VECS328
+VECS328	;MULTIPLICATION TABLE LESSON 3
+	WRITE !,?20,"MULTIPLICATION TABLE",!
+	FOR X=1:1:80 WRITE "*"
+	FOR OUTER=1:1:5 FOR INNER=1:1:3 WRITE !,?5,OUTER," * ",INNER," = ",OUTER*INNER
+	KILL INNER,OUTER,X
+	QUIT
+
+VECS330
+VECS330	;ATL/ACE PROGRAMMER-SALARY CALCS ;1/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;RECNR......record number of record being processed
+	;INCR.......control variable of loop; percent of increase
+	;SALARY.....base salary
+	;TAB........current tab position
+	;X..........control variable
+INIT	;
+	SET RECNR=1
+HEADING	;
+	WRITE !,?20,"SALARY TABLE",!
+	FOR X=1:1:60 WRITE "*"
+	WRITE !!,"SALARY",?15,"4%",?25,"4.5%",?35,"5%"
+	WRITE ?45,"5.5%",?55,"6%"
+	WRITE !,?15,"INCR",?25,"INCR",?35,"INCR"
+	WRITE ?45,"INCR",?55,"INCR",!!
+INPUT	;
+	SET SALARY=$PIECE($TEXT(DATA+RECNR),";;",2)
+CHECK	;
+	IF SALARY="" GOTO EXIT
+CALC	;
+	WRITE !,SALARY
+	SET TAB=5
+	FOR INCR=.04:.005:.06 DO INCRSAL
+	SET RECNR=RECNR+1
+	GOTO INPUT
+INCRSAL	;
+	SET TAB=TAB+10
+	WRITE ?TAB,$J(SALARY+(SALARY*INCR),6,0)
+	QUIT
+EXIT	;
+	KILL SALARY,RECNR,TAB,INCR,X
+	QUIT
+DATA	;
+	;;12000
+	;;12500
+	;;13000
+	;;13500
+
+VECS422
+VECS422	;ATL/ACE PROGRAMMER-ASCII CHART ;3/1/90
+	;;1
+	; This routine will print an ASCII chart
+	;
+	;VARIABLE LIST
+	;
+	;X.......loop counter
+	;START...starting character (space)
+	;
+	SET START=$A(" ")
+	F X=1:1:95 DO CHART
+EXIT	;
+	KILL X,START
+	QUIT
+CHART	;
+	WRITE !,$CHAR(START),?5,START
+	S START=START+1
+	QUIT
+
+VECS424
+VECS424	;ATL/ACE PROGRAMMER-RANDOM MESSAGES ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;RECNR.....record number of current record
+	;X.........loop counter
+	;
+START	;
+	F X=1:1:15 S RECNR=$RANDOM(5)+1 D MESSAGE
+EXIT	;
+	K X,RECNR
+	Q
+MESSAGE	;
+	W !,"LOOP NUMBER ",X
+	W ?20,$P($T(DATA+RECNR),";;",2)
+	Q
+DATA	;
+	;;HOLD ON...I'M THINKING
+	;;BE BACK IN A LITTLE WHILE
+	;;BEAM ME UP SCOTTY!
+	;;TOOK A COFFEE BREAK
+	;;SOME THINGS TAKE LONGER THAN OTHERS
+
+VECS4CTY
+VECS4CTY	;ATL/ACE PROGRAMMER-ADDRESS SYSTEM ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;CTYNAME.......City user wants to search for
+	;RECORD........Current record
+	;RECNR.........record number of current record
+	;ADDR..........Full address of current record
+	;CITY..........City of current record
+	;ANS..........user's response to "Press Enter to return
+	;             to the menu"
+	;
+START	;
+	R !!,"Enter city: ",CTYNAME:DTIME
+	I '$T!(CTYNAME["^") G EXIT
+	I CTYNAME'?1U.A W !,"City name must start with an uppercase letter"  G START
+	F RECNR=1:1:NAMES(0) D SEARCH
+	G EXIT
+SEARCH	;
+	S RECORD=NAMES(RECNR)
+	S ADDR=$P(RECORD,"^",3)
+	S CITY=$P(ADDR,",",1)
+	I CITY[CTYNAME D WRREC^VECS4MS
+	Q
+EXIT	;
+	R !!,"Press Enter to go to the menu",ANS:DTIME
+	K ADDR,CTYNAME,RECNR,RECORD,ANS
+	Q
+
+VECS4MN
+VECS4MN	;ATL/ACE PROGRAMMER-ADDRESS SYSTEM ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;DTIME......Delay time for READ (not to be KILLed)
+	;OPT........option number entered by the user
+	;ITEMS......number for each menu option
+	;
+INIT	;
+	D LOAD^VECS4MS
+START	;
+	D DISMENU
+	I OPT=""!(OPT["^") GOTO EXIT
+	D ^VECS4NM:OPT=1
+	D ^VECS4STR:OPT=2
+	D ^VECS4CTY:OPT=3
+	D ^VECS4STA:OPT=4
+	D ^VECS4ZIP:OPT=5
+	G START
+DISMENU	;
+	W !!,?20,"Let's try searching..."
+	W !!,"Search by..."
+	F ITEMS=1:1:5 W !,ITEMS,?5,$P($T(OPTIONS+ITEMS),";;",2)
+DISMENU1	;
+	R !!,"Enter option number: ",OPT:DTIME Q:OPT=""
+	I '$T!(OPT["^") QUIT
+	I (OPT<1)!(OPT>5) W !!,"Option number must be "
+	I  W "between 1 and 5" G DISMENU1
+	Q
+EXIT	;
+	K OPT,ITEMS,NAMES
+	Q
+OPTIONS	;
+	;;Name
+	;;Street name
+	;;City
+	;;State
+	;;Zip
+
+VECS4NM
+VECS4NM	;ATL/ACE PROGRAMMER-ADDRESS SYSTEM ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;SNAME........Name user wants to search for
+	;NAME.........Full name of the current record
+	;LNAME........Last name of current record
+	;FNAME........First name of current record
+	;RECNR........record number of current record
+	;RECORD.......current record
+	;ANS..........user's response to "Press Enter to return
+	;             to the menu"
+	;
+START	;
+	R !!,"Enter first letter or last name: ",SNAME:DTIME
+	I '$T!(SNAME["^") G EXIT
+	I SNAME'?1U.A W !,"Enter a letter or a last name" G START
+	F RECNR=1:1:NAMES(0) D SEARCH
+	G EXIT
+SEARCH	;
+	S RECORD=NAMES(RECNR)
+	S NAME=$P(RECORD,"^",1)
+	S LNAME=$P(NAME,",",1)
+	S FNAME=$P(NAME,",",2)
+	I $L(SNAME)=1 D LETTER
+	I $L(SNAME)'=1 D WORD
+	Q
+LETTER	;
+	I $E(LNAME)=SNAME DO WRREC^VECS4MS
+	Q
+WORD	;
+	I SNAME=LNAME DO WRREC^VECS4MS
+	Q
+EXIT	;
+	R !!,"Press Enter to return to the menu",ANS:DTIME
+	KILL SNAME,LNAME,FNAME,RECNR,ANS,NAME,RECORD
+	Q
+
+VECS4STA
+VECS4STA	;ATL/ACE PROGRAMMER-ADDRESS SYSTEM ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;STNAME......State user wants to search for
+	;RECORD......Current record
+	;RECNR.......Record number of current record
+	;ADDR........Full address of current record
+	;CITYST......City and state of current record
+	;STATE.......State of current record
+	;ANS..........user's response to "Press Enter to return
+	;             to the menu"
+START	;
+	R !!,"Enter state: ",STNAME:DTIME
+	I '$T!(STNAME["^") G EXIT
+	I STNAME'?2U W !,"State must be a 2 letter code" G START
+	F RECNR=1:1:NAMES(0) D SEARCH
+	G EXIT
+SEARCH	;
+	S RECORD=NAMES(RECNR)
+	S ADDR=$P(RECORD,"^",3)
+	S CITYST=$P(ADDR," ",1)
+	S STATE=$P(CITYST,",",2)
+	I STATE[STNAME D WRREC^VECS4MS
+	Q
+EXIT	;
+	R !!,"Press Enter to go to the menu",ANS:DTIME
+	K ADDR,ZIPCODE,RECNR,RECORD,ANS,CITY
+	Q
+
+VECS4STR
+VECS4STR	;ATL/ACE PROGRAMMER-ADDRESS SYSTEM ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;STRNAME.......Street name user wants to search for
+	;RECORD........Current record
+	;RECNR.........Record number of current record
+	;ADDR..........Full address
+	;ANS..........user's response to "Press Enter to return
+	;             to the menu"
+	;
+START	;
+	R !!,"Enter street name: ",STRNAME:DTIME
+	I '$T!(STRNAME["^") G EXIT
+	F RECNR=1:1:NAMES(0) D SEARCH
+	G EXIT
+SEARCH	;
+	S RECORD=NAMES(RECNR)
+	S ADDR=$P(RECORD,"^",2)
+	I ADDR[STRNAME D WRREC^VECS4MS
+	Q
+EXIT	;
+	R !!,"Press Enter to go to the menu",ANS:DTIME
+	K ADDR,STRNAME,RECNR,RECORD,ANS
+	Q
+
+VECS4ZIP
+VECS4ZIP	;ATL/ACE PROGRAMMER-ADDRESS SYSTEM ;3/1/90
+	;;1
+	;VARIABLE LIST
+	;
+	;RECORD........Current record
+	;RECNR.........Record number of current record
+	;ADDR..........Full address of current record
+	;ZIPCODE.......Zipcode that user wants to search for
+	;ZIP...........Zipcode of current record
+	;ANS..........user's response to "Press Enter to return
+	;             to the menu"
+	;
+START	;
+	R !!,"Enter zip code: ",ZIPCODE:DTIME
+	I '$T!(ZIPCODE["^") GOTO EXIT
+	I ZIPCODE'?5N W !,"Zip code must be 5 digits" G START
+	F RECNR=1:1:NAMES(0) DO SEARCH
+	G EXIT
+SEARCH	;
+	S RECORD=NAMES(RECNR)
+	S ADDR=$P(RECORD,"^",3)
+	S ZIP=$P(ADDR," ",2)
+	I ZIP[ZIPCODE DO WRREC^VECS4MS
+	QUIT
+EXIT	;
+	R !!,"Press Enter to go to the menu",ANS:DTIME
+	K ADDR,ZIPCODE,RECNR,RECORD,ANS
+	Q
+
+
